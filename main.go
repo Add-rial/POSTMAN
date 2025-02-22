@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 
 	"slices"
@@ -67,7 +69,8 @@ func main()  {
 	calculateAverages(numberOfRows)
 
 	getTop3(rows)                           //Gets the top 3 across all categories and stores it into the map
-	printResults()
+	//printResults()
+	toJSON()
 }
 
 func toFloat(str string) float32{       // converts a string to a float
@@ -159,18 +162,6 @@ func customSort(rows [][]string, n int) {
     }
 }
 
-func resetTop3() {
-    top3 = map[string][][]string{
-        "quiz":       {{}},
-        "midsem":     {{}},
-        "labtest":    {{}},
-        "weeklylab":  {{}},
-        "precompre":  {{}},
-        "compre":     {{}},
-        "total":      {{}},
-    }
-	top3 = nil
-}
 
 func printResults(){
 	fmt.Println("\n\n\n\n---------------------------------------------------------------------------\nGeneral Averages: ")
@@ -188,5 +179,44 @@ func printResults(){
 			fmt.Printf("\n\t\tRank: %v--->Emplid: %v......Marks: %v", i + 1, j[2], j[l + 4])
 		}
 	}
-	resetTop3()
+}
+
+func toJSON(){
+	top3Map := make(map[string]map[int]map[string]string)
+	for l, key := range keys{
+		top3Map[key] = make(map[int]map[string]string)
+		for i, j := range top3[key]{
+			top3Map[key][i +1 ] = make(map[string]string)
+			top3Map[key][i + 1]["emplid"] = j[2]
+			top3Map[key][i + 1]["marks"] = j[l + 4]
+			top3Map[key][i + 1]["rank"] = strconv.Itoa(i + 1)
+		}
+	}
+
+	branchAveragesMap := make(map[string]float32)
+	for key, i := range branchAverages{
+		branchAveragesMap[key] = i[ele - 1]
+	}
+
+	superMap := make(map[string]any)
+	superMap["General Average"] = generalAverages
+	superMap["Branch averages"] = branchAveragesMap
+	superMap["Top 3"] = top3Map
+
+	j, err := json.MarshalIndent(superMap, "", "	")
+	if err != nil{
+		log.Printf("Unable to convert to json\nERROR: %v\n", err)
+	}
+	file, err := os.Create("data.json")
+	if err != nil {
+		log.Printf("Error creating file\nERROR: %v\n", err)
+	}
+	defer file.Close()
+
+	_, err = file.Write(j)
+	if err != nil {
+		log.Printf("Error writing to file\nERROR: %v\n", err)
+	}
+
+	fmt.Println("Data successfully written to data.json")
 }
