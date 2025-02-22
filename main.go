@@ -28,11 +28,22 @@ func main()  {
 	if err != nil{
 		log.Fatal(err)
 	}
+	rows = removeEmptyRows(rows)
+	
+}
 
-	for _, row := range rows{
-		for _, cell := range row{
-			fmt.Printf("%v ", cell)
+func removeEmptyRows(rows [][]string) [][]string{
+	var elementsToPop []int
+
+	for index, row := range rows{
+		if len(row) < 11{
+			elementsToPop = append(elementsToPop, index)
 		}
-		fmt.Println()
 	}
+
+	for i := len(elementsToPop) - 1; i >= 0; i--{
+		rows = append(rows[:elementsToPop[i]], rows[elementsToPop[i] + 1:]...)    //...unpacks the results of the slice in the 2nd argument
+	}
+
+	return rows
 }
