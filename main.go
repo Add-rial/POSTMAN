@@ -7,6 +7,9 @@ import (
 
 	"github.com/xuri/excelize/v2"
 )	
+var ele int = 7 
+var generalAverages = make([]float32, ele)
+var branchAverages = map[string][]float32{}
 
 func main()  {
 	fmt.Println("Hello world")
@@ -24,7 +27,7 @@ func main()  {
 		}
 	}()
 	
-	sheet := f.GetSheetName(0)
+	sheet := f.GetSheetName(0)				//removing unwanted rows from the data
 	rows, err := f.GetRows(sheet)
 	if err != nil{
 		log.Fatal(err)
@@ -32,7 +35,8 @@ func main()  {
 	rows = rows[1:]
 	elementsToPop := findEmptyRows(rows)
 	rows = removeEmptyRows(rows, elementsToPop)
-	fmt.Println(rows)
+	
+	calaculateSum(rows)
 }
 
 func toFloat(str string) float32{       // converts a string to a float
@@ -68,4 +72,19 @@ func removeEmptyRows(rows [][]string, elementsToPop []int) [][]string{
 	}
 
 	return rows
+}
+
+func calaculateSum(rows [][]string) {         //calaculates only the sum of all the required elements
+	for _, row := range rows{
+		data := row[4:]
+		for i := range ele{
+			generalAverages[i] += toFloat(data[i])
+
+			branchCode := row[3][4:6]
+			if branchAverages[branchCode] == nil{
+				branchAverages[branchCode] = make([]float32, ele)
+			}
+			branchAverages[branchCode][i] += toFloat(data[i])
+		}
+	}
 }
