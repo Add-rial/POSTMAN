@@ -43,12 +43,13 @@ func findEmptyRows(rows [][]string) []int{
 	var elementsToPop []int
 
 	for index, row := range rows{
-		total_pre_compre := toFloat(row[4]) + toFloat(row[5]) + toFloat(row[6]) + toFloat(row[7])
-		total := total_pre_compre + toFloat(row[9])
 		if len(row) < 11{
 			log.Printf("Data not found for sr no: %v\n", row[0])
 			elementsToPop = append(elementsToPop, index)
+			continue
 		}
+		total_pre_compre := toFloat(row[4]) + toFloat(row[5]) + toFloat(row[6]) + toFloat(row[7])
+		total := total_pre_compre + toFloat(row[9])
 		if toFloat(row[10]) != total && toFloat(row[10]) != total_pre_compre{
 			log.Printf("Data mismatch for sr no: %v\n", row[0])
 			elementsToPop = append(elementsToPop, index)
