@@ -29,6 +29,7 @@ func main()  {
 	if err != nil{
 		log.Fatal(err)
 	}
+	rows = rows[1:]
 	elementsToPop := findEmptyRows(rows)
 	rows = removeEmptyRows(rows, elementsToPop)
 	fmt.Println(rows)
