@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/xuri/excelize/v2"
+	"slices"
 )	
 var ele int = 7 
 var generalAverages = make([]float32, ele)
@@ -78,7 +79,7 @@ func findEmptyRows(rows [][]string) []int{
 
 func removeEmptyRows(rows [][]string, elementsToPop []int) [][]string{
 	for i := len(elementsToPop) - 1; i >= 0; i--{
-		rows = append(rows[:elementsToPop[i]], rows[elementsToPop[i] + 1:]...)    //...unpacks the results of the slice in the 2nd argument
+		rows = slices.Delete(rows, elementsToPop[i], elementsToPop[i] + 1)
 	}
 
 	return rows
