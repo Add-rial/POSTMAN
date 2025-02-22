@@ -138,17 +138,16 @@ func calculateAverages(n float32){
 
 func getTop3(rows [][]string){
 	n := 4
-	for p := range top3{
+	for _, key := range keys{
 		rowscopy := slices.Clone(rows)
         customSort(rowscopy, n)
 
         // Assign the top 3 from the sorted copy to the map
-        top3[p] = slices.Clone(rowscopy[:3])
+        top3[key] = slices.Clone(rowscopy[:3])
 		rowscopy = nil
         n++
 	}
-} 
-
+}
 
 func customSort(rows [][]string, n int) {
     for i := 0; i < len(rows)-1; i++ {
