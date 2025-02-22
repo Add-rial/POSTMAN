@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/xuri/excelize/v2"
 )	
@@ -30,17 +31,25 @@ func main()  {
 	}
 	elementsToPop := findEmptyRows(rows)
 	rows = removeEmptyRows(rows, elementsToPop)
+	fmt.Println(rows)
+}
+
+func toFloat(str string) float32{       // converts a string to a float
+	i, _ := strconv.ParseFloat(str, 32)
+	return float32(i)
 }
 
 func findEmptyRows(rows [][]string) []int{
 	var elementsToPop []int
 
 	for index, row := range rows{
+		total_pre_compre := toFloat(row[4]) + toFloat(row[5]) + toFloat(row[6]) + toFloat(row[7])
+		total := total_pre_compre + toFloat(row[9])
 		if len(row) < 11{
 			log.Printf("Data not found for sr no: %v\n", row[0])
 			elementsToPop = append(elementsToPop, index)
 		}
-		if row[10] != row[4] + row[5] + row[6] + row[7] + row[8] + row[9]{
+		if toFloat(row[10]) != total && toFloat(row[10]) != total_pre_compre{
 			log.Printf("Data mismatch for sr no: %v\n", row[0])
 			elementsToPop = append(elementsToPop, index)
 		}
