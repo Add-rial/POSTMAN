@@ -3,14 +3,25 @@ package main
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strconv"
 
-	"github.com/xuri/excelize/v2"
 	"slices"
+
+	"github.com/xuri/excelize/v2"
 )	
 var ele int = 7 
 var generalAverages = make([]float32, ele)
 var branchAverages = map[string][]float32{}
+var top3 = map[string][][]string{
+	"quiz":			{{}},
+	"midsem":		{{}},
+	"labtest":		{{}},
+	"weeklylab":	{{}},
+	"precompre":	{{}},
+	"compre":		{{}},
+	"total":		{{}},
+}
 
 /*
 	While calculating the branch wise averages, i am calculating the averages of all tests instead of
@@ -42,12 +53,11 @@ func main()  {
 	elementsToPop := findEmptyRows(rows)
 	rows = removeEmptyRows(rows, elementsToPop)
 	
-	calaculateSum(rows)
+	calaculateSum(rows)                     //Calculating averages
 	numberOfRows := float32(len(rows))
 	calculateAverages(numberOfRows)
 
-	printMap()
-	fmt.Println(generalAverages)
+	getTop3(rows)                           //Gets the top 3 across all categories and stores it into the map
 }
 
 func toFloat(str string) float32{       // converts a string to a float
@@ -119,4 +129,17 @@ func printMap() {
     for key, value := range branchAverages {
         fmt.Printf("%s: %v\n", key, value)
     }
+}
+
+func getTop3(rows [][]string){
+	n := 4
+	for p := range top3{
+		sort.Slice(rows, func(i, j int) bool{
+			return toFloat(rows[i][n]) > toFloat(rows[j][n])
+		})
+
+		top3[p] = rows[:3]
+
+		n++
+	}
 }
