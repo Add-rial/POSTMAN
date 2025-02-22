@@ -3,15 +3,24 @@ package main
 import (
 	"fmt"
 	"log"
-	"sort"
 	"strconv"
 
 	"slices"
 
 	"github.com/xuri/excelize/v2"
 )	
+
+var keys = []string{"quiz", "midsem", "labtest", "weeklylab", "precompre", "compre", "total"}
 var ele int = 7 
-var generalAverages = make([]float32, ele)
+var generalAverages = map[string]float32{
+	"quiz":			0,
+	"midsem":		0,
+	"labtest":		0,
+	"weeklylab":	0,
+	"precompre":	0,
+	"compre":		0,
+	"total":		0,
+}
 var branchAverages = map[string][]float32{}
 var top3 = map[string][][]string{
 	"quiz":			{{}},
@@ -58,6 +67,7 @@ func main()  {
 	calculateAverages(numberOfRows)
 
 	getTop3(rows)                           //Gets the top 3 across all categories and stores it into the map
+	printResults()
 }
 
 func toFloat(str string) float32{       // converts a string to a float
@@ -96,10 +106,11 @@ func removeEmptyRows(rows [][]string, elementsToPop []int) [][]string{
 }
 
 func calaculateSum(rows [][]string) {         //calaculates only the sum of all the required elements
+
 	for _, row := range rows{
 		data := row[4:]
-		for i := range ele{
-			generalAverages[i] += toFloat(data[i])
+		for i, key := range keys{
+			generalAverages[key] += toFloat(data[i])
 
 			if toFloat(row[3][:4]) == 2024.0{
 				branchCode := row[3][4:6]
@@ -115,7 +126,7 @@ func calaculateSum(rows [][]string) {         //calaculates only the sum of all 
 }
 
 func calculateAverages(n float32){
-	for i := range ele{
+	for i := range generalAverages{
 		generalAverages[i] /= n
 	}
 	for _, value := range branchAverages{
@@ -125,21 +136,58 @@ func calculateAverages(n float32){
 	}
 }
 
-func printMap() {
-    for key, value := range branchAverages {
-        fmt.Printf("%s: %v\n", key, value)
-    }
-}
-
 func getTop3(rows [][]string){
 	n := 4
 	for p := range top3{
-		sort.Slice(rows, func(i, j int) bool{
-			return toFloat(rows[i][n]) > toFloat(rows[j][n])
-		})
+		rowscopy := slices.Clone(rows)
+        customSort(rowscopy, n)
 
-		top3[p] = rows[:3]
-
-		n++
+        // Assign the top 3 from the sorted copy to the map
+        top3[p] = slices.Clone(rowscopy[:3])
+		rowscopy = nil
+        n++
 	}
+} 
+
+
+func customSort(rows [][]string, n int) {
+    for i := 0; i < len(rows)-1; i++ {
+        for j := 0; j < len(rows)-i-1; j++ {
+            if toFloat(rows[j][n]) < toFloat(rows[j+1][n]) { 
+                rows[j], rows[j+1] = rows[j+1], rows[j]
+            }
+        }
+    }
+}
+
+func resetTop3() {
+    top3 = map[string][][]string{
+        "quiz":       {{}},
+        "midsem":     {{}},
+        "labtest":    {{}},
+        "weeklylab":  {{}},
+        "precompre":  {{}},
+        "compre":     {{}},
+        "total":      {{}},
+    }
+	top3 = nil
+}
+
+func printResults(){
+	fmt.Println("\n\n\n\n---------------------------------------------------------------------------\nGeneral Averages: ")
+	for _, key := range keys{
+		fmt.Printf("Avg %v: %v\n", key, generalAverages[key])
+	}
+	fmt.Println("\n\n---------------------------------------------------------------------------\nBranch-wise Total Averages: ")
+	for i := range branchAverages{
+		fmt.Printf("Branch: %v--->%v\n", i, branchAverages[i][ele - 1])
+	}
+	fmt.Print("\n\n---------------------------------------------------------------------------\nTop 3 Rankings: ")
+	for l, key := range keys{
+		fmt.Printf("\n%v", key)
+		for i, j := range top3[key]{
+			fmt.Printf("\n\t\tRank: %v--->Emplid: %v......Marks: %v", i + 1, j[2], j[l + 4])
+		}
+	}
+	resetTop3()
 }
