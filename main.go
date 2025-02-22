@@ -37,6 +37,11 @@ func main()  {
 	rows = removeEmptyRows(rows, elementsToPop)
 	
 	calaculateSum(rows)
+	numberOfRows := float32(len(rows))
+	calculateAverages(numberOfRows)
+
+	printMap()
+	fmt.Println(generalAverages)
 }
 
 func toFloat(str string) float32{       // converts a string to a float
@@ -61,7 +66,7 @@ func findEmptyRows(rows [][]string) []int{
 		}
 	}
 
-	log.Printf("The following sr. no. will be removed to continue%v\n", elementsToPop)
+	log.Printf("The following indexex will be removed to continue%v\n", elementsToPop)
 
 	return elementsToPop
 }
@@ -80,11 +85,32 @@ func calaculateSum(rows [][]string) {         //calaculates only the sum of all 
 		for i := range ele{
 			generalAverages[i] += toFloat(data[i])
 
-			branchCode := row[3][4:6]
-			if branchAverages[branchCode] == nil{
-				branchAverages[branchCode] = make([]float32, ele)
+			if toFloat(row[3][:4]) == 2024.0{
+				branchCode := row[3][4:6]
+				if branchAverages[branchCode] == nil{
+					branchAverages[branchCode] = make([]float32, ele + 1)    //The last element of the slice stores the number of elements in it
+					branchAverages[branchCode][ele] = 0
+				}
+				branchAverages[branchCode][i] += toFloat(data[i])
+				branchAverages[branchCode][ele]++
 			}
-			branchAverages[branchCode][i] += toFloat(data[i])
 		}
 	}
+}
+
+func calculateAverages(n float32){
+	for i := range ele{
+		generalAverages[i] /= n
+	}
+	for _, value := range branchAverages{
+		for i := range ele{
+			value[i] /= value[ele] / float32(ele)          //To take care of extra times the last element was 
+		} 												   //incremented in calculateSum, we divide by ele
+	}
+}
+
+func printMap() {
+    for key, value := range branchAverages {
+        fmt.Printf("%s: %v\n", key, value)
+    }
 }
