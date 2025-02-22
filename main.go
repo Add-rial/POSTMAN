@@ -11,6 +11,11 @@ var ele int = 7
 var generalAverages = make([]float32, ele)
 var branchAverages = map[string][]float32{}
 
+/*
+	While calculating the branch wise averages, i am calculating the averages of all tests instead of
+	only for total because by the time i read the statement properly i had already written the code 
+*/
+
 func main()  {
 	fmt.Println("Hello world")
 
