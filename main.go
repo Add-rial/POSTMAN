@@ -81,10 +81,11 @@ func main()  {
 	calculateAverages(numberOfRows)
 
 	getTop3(rows)                           //Gets the top 3 across all categories and stores it into the map
-	printResults()
-	if *exportFlag == "json" {
+	if *exportFlag == "none" {
+		printResults()
+	}else if *exportFlag == "json" {
 		toJSON()
-	}else if *exportFlag != "none" {
+	}else {
 		fmt.Printf("<--export=%v> invalid commanf. Use -h or --help to know more about the valid commands\n", *exportFlag)
 		flag.PrintDefaults()
 	}
@@ -186,7 +187,7 @@ func customSort(rows [][]string, n int) {
 
 
 func printResults(){
-	fmt.Println("\n\n\n\n---------------------------------------------------------------------------\nGeneral Averages: ")
+	fmt.Println("\n---------------------------------------------------------------------------\nGeneral Averages: ")
 	for _, key := range keys{
 		fmt.Printf("Avg %v: %v\n", key, generalAverages[key])
 	}
@@ -199,6 +200,16 @@ func printResults(){
 		fmt.Printf("\n%v", key)
 		for i, j := range top3[key]{
 			fmt.Printf("\n\t\tRank: %v--->Emplid: %v......Marks: %v", i + 1, j[2], j[l + 4])
+		}
+	}
+	fmt.Print("\n\n---------------------------------------------------------------------------\nDISCREPENCIES: ")
+	for key, value := range discrepencies {
+		fmt.Printf("\n\t%v: ", key)
+		if len(value) == 0 {
+			fmt.Print("NONE")
+		}
+		for i := range value {
+			fmt.Printf("%v, ", value[i])
 		}
 	}
 	fmt.Println()
