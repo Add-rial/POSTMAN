@@ -43,8 +43,6 @@ var discrepencies = map[string][]int{
 */
 
 func main()  {
-	fmt.Println("Hello world")
-
 	//Adding the required flags
 	var exportFlag = flag.String("export", "none", "Enter --export=json to export the final summary as a json")
 	var classFilterFlag = flag.Int("class", -1, "Enter --class=<class> to only process records from that class")
@@ -104,12 +102,10 @@ func findEmptyRows(rows [][]string, classToFilter int) []int{
 		total_pre_compre := toFloat(row[4]) + toFloat(row[5]) + toFloat(row[6]) + toFloat(row[7])
 		total := total_pre_compre + toFloat(row[9])
 		if len(row) < 11{
-			log.Printf("Data not found for sr no: %v\n", row[0])
 			discrepencies["DATA NOT FOUND"] = append(discrepencies["DATA NOT FOUND"], int(toFloat(row[0])))
 			elementsToPop = append(elementsToPop, index)
 			continue												//To ensure that the elements are not added twice to the slice
 		}else if toFloat(row[10]) != total && toFloat(row[10]) != total_pre_compre{
-			log.Printf("Data mismatch for sr no: %v\n", row[0])
 			discrepencies["TOTAL ERROR"] = append(discrepencies["TOTAL ERROR"], int(toFloat(row[0])))
 			elementsToPop = append(elementsToPop, index)
 			continue
@@ -123,7 +119,6 @@ func findEmptyRows(rows [][]string, classToFilter int) []int{
 		elementsToPop = append(elementsToPop, index)        //Removees cases where class does not match classFilter
 	}
 
-	//fmt.Println(elementsToPop)
 	return elementsToPop
 }
 
