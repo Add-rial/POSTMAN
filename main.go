@@ -67,6 +67,9 @@ func main()  {
 	rows = rows[1:]
 	elementsToPop := findEmptyRows(rows, *classFilterFlag)
 	rows = removeEmptyRows(rows, elementsToPop)
+	if len(rows) < 1 {
+		log.Fatalln("Not a valid class")
+	}
 
 	calaculateSum(rows)                     //Calculating averages
 	numberOfRows := float32(len(rows))
@@ -76,6 +79,9 @@ func main()  {
 	printResults()
 	if *exportFlag == "json" {
 		toJSON()
+	}else if *exportFlag != "none" {
+		fmt.Printf("<--export=%v> invalid commanf. Use -h or --help to know more about the valid commands\n", *exportFlag)
+		flag.PrintDefaults()
 	}
 }
 
@@ -93,15 +99,22 @@ func findEmptyRows(rows [][]string, classToFilter int) []int{
 		if len(row) < 11{
 			log.Printf("Data not found for sr no: %v\n", row[0])
 			elementsToPop = append(elementsToPop, index)
+			continue												//To ensure that the elements are not added twice to the slice
 		}else if toFloat(row[10]) != total && toFloat(row[10]) != total_pre_compre{
 			log.Printf("Data mismatch for sr no: %v\n", row[0])
 			elementsToPop = append(elementsToPop, index)
-		}else if isClassFilter && int(toFloat(row[1])) != classToFilter {
-			elementsToPop = append(elementsToPop, index)        //Removees cases where class does not match classFilter
+			continue
+		}else if isClassFilter {
+			if int(toFloat(row[1])) == classToFilter{
+				continue
+			}
+		}else {
+			continue
 		}
+		elementsToPop = append(elementsToPop, index)        //Removees cases where class does not match classFilter
 	}
 
-
+	//fmt.Println(elementsToPop)
 	return elementsToPop
 }
 
@@ -184,6 +197,7 @@ func printResults(){
 			fmt.Printf("\n\t\tRank: %v--->Emplid: %v......Marks: %v", i + 1, j[2], j[l + 4])
 		}
 	}
+	fmt.Println()
 }
 
 func toJSON(){
