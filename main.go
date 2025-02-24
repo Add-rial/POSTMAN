@@ -6,9 +6,8 @@ import (
 	"log"
 	"os"
 	"strconv"
-
+	"flag"
 	"slices"
-
 	"github.com/xuri/excelize/v2"
 )	
 
@@ -42,16 +41,10 @@ var top3 = map[string][][]string{
 func main()  {
 	fmt.Println("Hello world")
 
-	var class int = -1
-
-	//Reading the command line arguments
-	/* if len(os.Args) < 2 {
-		log.Fatalln("ENTER PATH TO THE EXCEL FILE TO BE PARSED")
-	}else {
-
-	}
-
-	fmt.Println(os.Args[1:]) */
+	//Adding the required flags
+	var exportFlag = flag.String("export", "none", "Enter --export=json to export the final summary as a json")
+	var classFilterFlag = flag.Int("class", -1, "Enter --class=<class> to only process records from that class")
+	flag.Parse()
 
 	//opening the required file
 
@@ -72,7 +65,7 @@ func main()  {
 		log.Fatal(err)
 	}
 	rows = rows[1:]
-	elementsToPop := findEmptyRows(rows, class)
+	elementsToPop := findEmptyRows(rows, *classFilterFlag)
 	rows = removeEmptyRows(rows, elementsToPop)
 
 	calaculateSum(rows)                     //Calculating averages
@@ -80,8 +73,10 @@ func main()  {
 	calculateAverages(numberOfRows)
 
 	getTop3(rows)                           //Gets the top 3 across all categories and stores it into the map
-	//printResults()
-	toJSON()
+	printResults()
+	if *exportFlag == "json" {
+		toJSON()
+	}
 }
 
 func toFloat(str string) float32{       // converts a string to a float
