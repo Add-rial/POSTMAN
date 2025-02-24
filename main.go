@@ -42,6 +42,8 @@ var top3 = map[string][][]string{
 func main()  {
 	fmt.Println("Hello world")
 
+	var class int = -1
+
 	//opening the required file
 
 	f, err := excelize.OpenFile("CSF111_202425_01_GradeBook_stripped.xlsx")
@@ -61,7 +63,7 @@ func main()  {
 		log.Fatal(err)
 	}
 	rows = rows[1:]
-	elementsToPop := findEmptyRows(rows)
+	elementsToPop := findEmptyRows(rows, class)
 	rows = removeEmptyRows(rows, elementsToPop)
 	
 	calaculateSum(rows)                     //Calculating averages
@@ -78,24 +80,23 @@ func toFloat(str string) float32{       // converts a string to a float
 	return float32(i)
 }
 
-func findEmptyRows(rows [][]string) []int{
+func findEmptyRows(rows [][]string, classToFilter int) []int{
 	var elementsToPop []int
 
 	for index, row := range rows{
+		total_pre_compre := toFloat(row[4]) + toFloat(row[5]) + toFloat(row[6]) + toFloat(row[7])
+		total := total_pre_compre + toFloat(row[9])
 		if len(row) < 11{
 			log.Printf("Data not found for sr no: %v\n", row[0])
 			elementsToPop = append(elementsToPop, index)
-			continue
-		}
-		total_pre_compre := toFloat(row[4]) + toFloat(row[5]) + toFloat(row[6]) + toFloat(row[7])
-		total := total_pre_compre + toFloat(row[9])
-		if toFloat(row[10]) != total && toFloat(row[10]) != total_pre_compre{
+		}else if toFloat(row[10]) != total && toFloat(row[10]) != total_pre_compre{
 			log.Printf("Data mismatch for sr no: %v\n", row[0])
+			elementsToPop = append(elementsToPop, index)
+		} else if int(toFloat(row[1])) != classToFilter{
 			elementsToPop = append(elementsToPop, index)
 		}
 	}
 
-	log.Printf("The following indexex will be removed to continue%v\n", elementsToPop)
 
 	return elementsToPop
 }
