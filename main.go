@@ -47,8 +47,11 @@ func main()  {
 	flag.Parse()
 
 	//opening the required file
+	if len(flag.Args()) < 1 {
+		log.Fatalln("Please provide the excel file to be parsed as an argument")
+	}
 
-	f, err := excelize.OpenFile("CSF111_202425_01_GradeBook_stripped.xlsx")
+	f, err := excelize.OpenFile(flag.Arg(0))
 	if err != nil{
 		log.Fatalf("Error encountered while opening the required file\nERROR: %v\n", err)
 	}
@@ -77,7 +80,9 @@ func main()  {
 
 	getTop3(rows)                           //Gets the top 3 across all categories and stores it into the map
 	printResults()
+	fmt.Println(*exportFlag)
 	if *exportFlag == "json" {
+		fmt.Println("in")
 		toJSON()
 	}else if *exportFlag != "none" {
 		fmt.Printf("<--export=%v> invalid commanf. Use -h or --help to know more about the valid commands\n", *exportFlag)
