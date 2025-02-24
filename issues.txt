@@ -1,3 +1,1 @@
-exportFlag is holding the default value even when it is passed a value 
 haven't added discrepencies key value to the json being exported
-want to improve the findEmptyRows function so that it is not an if-else ladded puzzle

@@ -8,6 +8,18 @@
 		"AA": 166.25,
 		"AD": 154.82143
 	},
+	"DISCREPENCIES AT Sr. No.": {
+		"DATA NOT FOUND": [],
+		"TOTAL ERROR": [
+			7,
+			33,
+			46,
+			135,
+			193,
+			224,
+			371
+		]
+	},
 	"General Average": {
 		"compre": 44.76716,
 		"labtest": 18.465687,

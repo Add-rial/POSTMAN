@@ -32,6 +32,10 @@ var top3 = map[string][][]string{
 	"compre":		{{}},
 	"total":		{{}},
 }
+var discrepencies = map[string][]int{
+	"DATA NOT FOUND":		{},
+	"TOTAL ERROR":			{},
+}
 
 /*
 	While calculating the branch wise averages, i am calculating the averages of all tests instead of
@@ -80,9 +84,7 @@ func main()  {
 
 	getTop3(rows)                           //Gets the top 3 across all categories and stores it into the map
 	printResults()
-	fmt.Println(*exportFlag)
 	if *exportFlag == "json" {
-		fmt.Println("in")
 		toJSON()
 	}else if *exportFlag != "none" {
 		fmt.Printf("<--export=%v> invalid commanf. Use -h or --help to know more about the valid commands\n", *exportFlag)
@@ -103,10 +105,12 @@ func findEmptyRows(rows [][]string, classToFilter int) []int{
 		total := total_pre_compre + toFloat(row[9])
 		if len(row) < 11{
 			log.Printf("Data not found for sr no: %v\n", row[0])
+			discrepencies["DATA NOT FOUND"] = append(discrepencies["DATA NOT FOUND"], int(toFloat(row[0])))
 			elementsToPop = append(elementsToPop, index)
 			continue												//To ensure that the elements are not added twice to the slice
 		}else if toFloat(row[10]) != total && toFloat(row[10]) != total_pre_compre{
 			log.Printf("Data mismatch for sr no: %v\n", row[0])
+			discrepencies["TOTAL ERROR"] = append(discrepencies["TOTAL ERROR"], int(toFloat(row[0])))
 			elementsToPop = append(elementsToPop, index)
 			continue
 		}else if isClassFilter {
@@ -226,6 +230,7 @@ func toJSON(){
 	superMap["General Average"] = generalAverages
 	superMap["Branch averages"] = branchAveragesMap
 	superMap["Top 3"] = top3Map
+	superMap["DISCREPENCIES AT Sr. No."] = discrepencies
 
 	j, err := json.MarshalIndent(superMap, "", "	")
 	if err != nil{
