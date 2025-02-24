@@ -44,6 +44,15 @@ func main()  {
 
 	var class int = -1
 
+	//Reading the command line arguments
+	/* if len(os.Args) < 2 {
+		log.Fatalln("ENTER PATH TO THE EXCEL FILE TO BE PARSED")
+	}else {
+
+	}
+
+	fmt.Println(os.Args[1:]) */
+
 	//opening the required file
 
 	f, err := excelize.OpenFile("CSF111_202425_01_GradeBook_stripped.xlsx")
@@ -65,7 +74,7 @@ func main()  {
 	rows = rows[1:]
 	elementsToPop := findEmptyRows(rows, class)
 	rows = removeEmptyRows(rows, elementsToPop)
-	
+
 	calaculateSum(rows)                     //Calculating averages
 	numberOfRows := float32(len(rows))
 	calculateAverages(numberOfRows)
@@ -82,7 +91,7 @@ func toFloat(str string) float32{       // converts a string to a float
 
 func findEmptyRows(rows [][]string, classToFilter int) []int{
 	var elementsToPop []int
-
+	var isClassFilter bool = classToFilter != -1     //didn't put in the else if condition to reduce computations of the same task
 	for index, row := range rows{
 		total_pre_compre := toFloat(row[4]) + toFloat(row[5]) + toFloat(row[6]) + toFloat(row[7])
 		total := total_pre_compre + toFloat(row[9])
@@ -92,8 +101,8 @@ func findEmptyRows(rows [][]string, classToFilter int) []int{
 		}else if toFloat(row[10]) != total && toFloat(row[10]) != total_pre_compre{
 			log.Printf("Data mismatch for sr no: %v\n", row[0])
 			elementsToPop = append(elementsToPop, index)
-		} else if int(toFloat(row[1])) != classToFilter{
-			elementsToPop = append(elementsToPop, index)
+		}else if isClassFilter && int(toFloat(row[1])) != classToFilter {
+			elementsToPop = append(elementsToPop, index)        //Removees cases where class does not match classFilter
 		}
 	}
 
@@ -147,7 +156,7 @@ func getTop3(rows [][]string){
         customSort(rowscopy, n)
 
         // Assign the top 3 from the sorted copy to the map
-        top3[key] = slices.Clone(rowscopy[:3])
+        top3[key] = rowscopy[:3]
 		rowscopy = nil
         n++
 	}
